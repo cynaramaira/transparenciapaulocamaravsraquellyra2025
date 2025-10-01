@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Balança da Transparência: PE 2022 vs 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --laranja-jamildo: #f83d03;
+            --azul-jamildo: #024796;
+            --background-dark: #0a192f;
+            --text-light: #e6f1ff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            max-width: 600px;
+            max-height: 600px;
+            background: radial-gradient(circle, #011a36 0%, #010c1a 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            top: 20px;
+            left: 0;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        #title-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-light);
+            z-index: 50;
+            transition: opacity 0.5s ease;
+        }
+
+        #start-button {
+            position: absolute;
+            bottom: 30%;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--laranja-jamildo);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(248, 61, 3, 0.5);
+            transition: all 0.3s ease;
+            z-index: 51;
+        }
+        #start-button:hover {
+            transform: scale(1.05);
+        }
+        #start-button.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Estrutura da Balança */
+        .scale-structure {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        .scale-structure.visible {
+            opacity: 1;
+        }
+        .scale-base {
+            width: 150px;
+            height: 20px;
+            background: linear-gradient(#7f8c8d, #34495e);
+            border-radius: 5px 5px 0 0;
+        }
+        .scale-pillar {
+            width: 10px;
+            height: 250px;
+            background: linear-gradient(#bdc3c7, #7f8c8d);
+            position: absolute;
+            bottom: 20px;
+        }
+        .scale-beam {
+            width: 400px;
+            height: 8px;
+            background: linear-gradient(#bdc3c7, #7f8c8d);
+            border-radius: 4px;
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform-origin: center;
+            margin-left: -200px;
+            transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .plate {
+            position: absolute;
+            width: 150px;
+            height: 100px; /* Altura para empilhar os pesos */
+            top: 115px;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+        }
+        .plate-base {
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(#7f8c8d, #34495e);
+            border-radius: 50%;
+        }
+        .plate-left { left: 10px; }
+        .plate-right { right: 10px; }
+        .chain {
+            width: 2px;
+            height: 15px;
+            background-color: #7f8c8d;
+            position: absolute;
+            top: -15px;
+        }
+        .chain-left { left: 50%; }
+        .chain-right { right: 50%; }
+
+        /* Pesos */
+        .weight {
+            width: 30px;
+            height: 11px; /* Ajustado para caber no prato */
+            border-radius: 4px;
+            margin-bottom: 1px; /* Ajustado para caber no prato */
+            color: white;
+            font-size: 8px; /* Reduzido para melhor encaixe */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: inset 0 -2px 3px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(-200px);
+            transition: transform 1s ease-out, opacity 0.5s ease;
+        }
+        .weight.camara { background-color: var(--azul-jamildo); }
+        .weight.lyra { background-color: var(--laranja-jamildo); }
+        .weight.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Personagens */
+        .person-container {
+            position: absolute;
+            top: 100px;
+            text-align: center;
+            color: var(--text-light);
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        .person-container.visible { opacity: 1; }
+        .person-container img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            object-fit: cover;
+        }
+        #camara-container { left: 40px; }
+        #lyra-container { right: 40px; }
+        
+        .final-score {
+            font-size: 2rem;
+            font-weight: 900;
+        }
+        .final-rank {
+            font-size: 1.2rem;
+        }
+        .rank-down { color: #e74c3c; }
+
+        #narrative-panel {
+            position: absolute;
+            bottom: -150px;
+            left: 5%;
+            width: 90%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border-top: 2px solid var(--laranja-jamildo);
+            padding: 1rem;
+            border-radius: 8px 8px 0 0;
+            transition: bottom 0.5s ease-in-out;
+            text-align: center;
+            color: var(--text-light);
+        }
+        #narrative-panel.active {
+            bottom: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="https://jamildo.com" target="_blank">
+                <img src="https://jamildo.com/media/uploads/brancologojamildo_6xe6mA0.png" alt="Logo Jamildo" class="h-8" onerror="this.onerror=null;this.src='https://placehold.co/120x32/0a192f/ffffff?text=Jamildo';">
+            </a>
+        </header>
+
+        <div id="title-container">
+            <h1 class="text-3xl md:text-4xl font-black">A BALANÇA DA TRANSPARÊNCIA</h1>
+            <p class="text-lg text-gray-300">Pernambuco: 2022 vs 2025</p>
+        </div>
+        <button id="start-button">Começar Análise</button>
+
+        <div id="camara-container" class="person-container">
+            <img src="https://jamildo.com/media/uploads/2024/08/paulo-camara.jpg" alt="Foto de Paulo Câmara" onerror="this.onerror=null;this.src='https://placehold.co/80x80/024796/ffffff?text=PC';">
+            <h2 class="font-bold mt-2">Paulo Câmara</h2>
+            <p class="text-sm">2022</p>
+            <p id="camara-score" class="final-score">74,3</p>
+            <p id="camara-rank" class="final-rank">9º Lugar</p>
+        </div>
+
+        <div id="lyra-container" class="person-container">
+            <img src="https://jamildo.com/media/uploads/2025/05/raquel-lyra_oln5yqwc.jpg" alt="Foto de Raquel Lyra" onerror="this.onerror=null;this.src='https://placehold.co/80x80/f83d03/ffffff?text=RL';">
+            <h2 class="font-bold mt-2">Raquel Lyra</h2>
+            <p class="text-sm">2025</p>
+            <p id="lyra-score" class="final-score">75,6</p>
+            <p id="lyra-rank" class="final-rank">11º Lugar <span class="rank-down">▼</span></p>
+        </div>
+        
+        <div id="scale-container" class="scale-structure">
+            <div class="scale-pillar"></div>
+            <div id="scale-beam" class="scale-beam">
+                 <div class="plate plate-left">
+                    <div class="chain chain-left"></div>
+                    <div id="camara-weights" class="plate-base"></div>
+                </div>
+                <div class="plate plate-right">
+                    <div class="chain chain-right"></div>
+                    <div id="lyra-weights" class="plate-base"></div>
+                </div>
+            </div>
+            <div class="scale-base"></div>
+        </div>
+
+        <div id="narrative-panel">
+            <p id="narrative-text"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const startButton = document.getElementById('start-button');
+            const titleContainer = document.getElementById('title-container');
+            const scaleContainer = document.getElementById('scale-container');
+            const personContainers = document.querySelectorAll('.person-container');
+            const narrativePanel = document.getElementById('narrative-panel');
+            const narrativeText = document.getElementById('narrative-text');
+            const scaleBeam = document.getElementById('scale-beam');
+            const camaraWeightsContainer = document.getElementById('camara-weights');
+            const lyraWeightsContainer = document.getElementById('lyra-weights');
+
+            // Mapeamento simplificado das dimensões para comparação
+            const data = [
+                { dimension: 'Plataformas', camara: 100, lyra: 87.0, text: 'Em Plataformas, a gestão anterior tinha nota máxima, enquanto a atual apresenta uma leve queda.' },
+                { dimension: 'Transf. Digital', camara: 75.0, lyra: 96.2, text: 'Raquel Lyra avança significativamente em Transformação Digital, um dos pontos fortes da nova gestão.' },
+                { dimension: 'Dados', camara: 83.3, lyra: 64.3, text: 'A disponibilização de Dados Abertos era mais forte em 2022. É um ponto de fragilidade na avaliação atual.' },
+                { dimension: 'Governança', camara: 73.9, lyra: 65.2, text: 'Mecanismos de Administração e Governança também perdem força na comparação entre os anos.' },
+                { dimension: 'Transp. Financeira', camara: 72.9, lyra: 79.3, text: 'Na Transparência Financeira e Orçamentária, a gestão de Raquel Lyra mostra melhora.' },
+                { dimension: 'Participação', camara: 46.4, lyra: 70.0, text: 'A nota de Participação Social teve um dos maiores crescimentos, indicando mais engajamento.' },
+                 { dimension: 'Obras', camara: 0, lyra: 68.2, text: 'O critério de Obras, não avaliado em 2022, agora soma pontos para a transparência do estado.' },
+            ];
+
+            let currentStep = -1;
+
+            function updateScene() {
+                if (currentStep >= data.length) {
+                    narrativeText.innerHTML = '<strong>Resultado:</strong> Apesar da nota geral ter subido levemente de 74,3 para 75,6, Pernambuco caiu no ranking nacional (9º para 11º), pois outros estados avançaram mais rápido. As fragilidades em Dados e Governança foram decisivas.';
+                    startButton.textContent = 'Reiniciar Análise';
+                    startButton.classList.remove('hidden');
+                    scaleBeam.style.transform = `rotate(0.5deg)`; // Inclinação final simbólica para Lyra
+                    return;
+                }
+
+                const item = data[currentStep];
+                narrativeText.textContent = item.text;
+
+                // Adicionar pesos
+                const weightCamara = document.createElement('div');
+                weightCamara.className = 'weight camara';
+                weightCamara.textContent = item.camara;
+                camaraWeightsContainer.parentElement.appendChild(weightCamara); // Alterado para empilhar sobre o prato
+
+                const weightLyra = document.createElement('div');
+                weightLyra.className = 'weight lyra';
+                weightLyra.textContent = item.lyra;
+                lyraWeightsContainer.parentElement.appendChild(weightLyra); // Alterado para empilhar sobre o prato
+
+                setTimeout(() => {
+                    weightCamara.classList.add('show');
+                    weightLyra.classList.add('show');
+                }, 100);
+
+                // Animar balança
+                const diff = item.lyra - item.camara;
+                let angle = 0;
+                if (Math.abs(diff) > 5) {
+                    angle = diff > 0 ? 2.5 : -2.5; // inclinação simbólica de 2.5 graus
+                }
+                scaleBeam.style.transform = `rotate(${angle}deg)`;
+
+                // Preparar para próximo passo
+                setTimeout(() => {
+                    if (currentStep < data.length -1) {
+                        startButton.classList.remove('hidden');
+                    } else {
+                         startButton.classList.remove('hidden');
+                         startButton.textContent = 'Ver Resultado Final';
+                    }
+                }, 1500); // tempo para o usuário ler antes do próximo botão aparecer
+            }
+
+            startButton.addEventListener('click', () => {
+                if (currentStep === -1) { // Primeira vez
+                    titleContainer.style.opacity = '0';
+                    startButton.classList.add('hidden');
+                    
+                    setTimeout(() => {
+                        titleContainer.style.display = 'none';
+                        scaleContainer.classList.add('visible');
+                        personContainers.forEach(c => c.classList.add('visible'));
+                        narrativePanel.classList.add('active');
+                        startButton.textContent = 'Próxima Dimensão';
+                        currentStep++;
+                        updateScene();
+                    }, 500);
+
+                } else if (currentStep < data.length) {
+                    startButton.classList.add('hidden');
+                    currentStep++;
+                    updateScene();
+                } else {
+                    location.reload();
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
+
