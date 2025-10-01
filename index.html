@@ -120,7 +120,7 @@
             background: linear-gradient(#bdc3c7, #7f8c8d);
             border-radius: 4px;
             position: absolute;
-            top: 100px;
+            top: 80px; /* Ajustado para cima */
             left: 50%;
             transform-origin: center;
             margin-left: -200px;
@@ -130,7 +130,7 @@
             position: absolute;
             width: 150px;
             height: 100px; /* Altura para empilhar os pesos */
-            top: 115px;
+            top: 95px; /* Ajustado para cima */
             display: flex;
             flex-direction: column-reverse;
             align-items: center;
@@ -140,6 +140,9 @@
             height: 10px;
             background: linear-gradient(#7f8c8d, #34495e);
             border-radius: 50%;
+            position: absolute; /* Adicionado para posicionar pesos acima */
+            bottom: 0; /* Adicionado para posicionar pesos acima */
+            z-index: 1; /* Garante que o prato fique atrás dos pesos */
         }
         .plate-left { left: 10px; }
         .plate-right { right: 10px; }
@@ -169,6 +172,8 @@
             opacity: 0;
             transform: translateY(-200px);
             transition: transform 1s ease-out, opacity 0.5s ease;
+            position: relative; /* Adicionado para empilhamento */
+            z-index: 2; /* Garante que os pesos fiquem na frente do prato */
         }
         .weight.camara { background-color: var(--azul-jamildo); }
         .weight.lyra { background-color: var(--laranja-jamildo); }
@@ -177,10 +182,16 @@
             transform: translateY(0);
         }
         
+        #camara-weights, #lyra-weights {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+        }
+
         /* Personagens */
         .person-container {
             position: absolute;
-            top: 100px;
+            top: 80px; /* Ajustado para cima */
             text-align: center;
             color: var(--text-light);
             opacity: 0;
@@ -262,11 +273,13 @@
             <div id="scale-beam" class="scale-beam">
                  <div class="plate plate-left">
                     <div class="chain chain-left"></div>
-                    <div id="camara-weights" class="plate-base"></div>
+                    <div id="camara-weights"></div>
+                    <div class="plate-base"></div>
                 </div>
                 <div class="plate plate-right">
                     <div class="chain chain-right"></div>
-                    <div id="lyra-weights" class="plate-base"></div>
+                    <div id="lyra-weights"></div>
+                    <div class="plate-base"></div>
                 </div>
             </div>
             <div class="scale-base"></div>
@@ -318,12 +331,12 @@
                 const weightCamara = document.createElement('div');
                 weightCamara.className = 'weight camara';
                 weightCamara.textContent = item.camara;
-                camaraWeightsContainer.parentElement.appendChild(weightCamara); // Alterado para empilhar sobre o prato
+                camaraWeightsContainer.appendChild(weightCamara);
 
                 const weightLyra = document.createElement('div');
                 weightLyra.className = 'weight lyra';
                 weightLyra.textContent = item.lyra;
-                lyraWeightsContainer.parentElement.appendChild(weightLyra); // Alterado para empilhar sobre o prato
+                lyraWeightsContainer.appendChild(weightLyra);
 
                 setTimeout(() => {
                     weightCamara.classList.add('show');
@@ -377,4 +390,5 @@
     </script>
 </body>
 </html>
+
 
