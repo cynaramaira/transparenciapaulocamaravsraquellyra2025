@@ -115,7 +115,7 @@
             bottom: 20px;
         }
         .scale-beam {
-            width: 400px;
+            width: 360px; /* Reduzido para evitar sobreposição */
             height: 8px;
             background: linear-gradient(#bdc3c7, #7f8c8d);
             border-radius: 4px;
@@ -123,12 +123,12 @@
             top: 80px; /* Ajustado para cima */
             left: 50%;
             transform-origin: center;
-            margin-left: -200px;
+            margin-left: -180px; /* Metade da nova largura */
             transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
         .plate {
             position: absolute;
-            width: 150px;
+            width: 120px; /* Reduzido para caber na nova balança */
             height: 100px; /* Altura para empilhar os pesos */
             top: 95px; /* Ajustado para cima */
             display: flex;
@@ -206,8 +206,8 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             object-fit: cover;
         }
-        #camara-container { left: 40px; }
-        #lyra-container { right: 40px; }
+        #camara-container { left: 60px; } /* Movido para dentro */
+        #lyra-container { right: 60px; } /* Movido para dentro */
         
         .final-score {
             font-size: 2rem;
@@ -390,5 +390,4 @@
     </script>
 </body>
 </html>
-
 
